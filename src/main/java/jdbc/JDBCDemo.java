@@ -5,31 +5,52 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JDBCDemo {
 	public static void main(String[] args) {
 		String DB_URL = "jdbc:mysql://localhost/practice";
 		String DB_USER = "root";
 		String DB_PASSWORD = "Nuvelabs123$";
-
-		try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-				Statement statement = connection.createStatement();) {
-//			create(statement); // create
-			retrieve(statement);
-		} catch (SQLException e) {
+		try(Connection connection = DriverManager.getConnection(DB_URL ,DB_USER, DB_PASSWORD);
+				Statement statement = connection.createStatement();){
+			//Create(statement);
+			Update(statement);
+			List<String> regions = Reterive(statement);
+			System.out.println(regions);
+		}
+		catch(SQLException e) {
 			e.printStackTrace();
 		}
+			
+		
 	}
 
-	private static void retrieve(Statement statement) throws SQLException {
-		ResultSet resultSet = statement.executeQuery("SELECT * from regions");
-		while (resultSet.next()) {
-			System.out.println(resultSet.getInt(1));
-			System.out.println(resultSet.getNString("REGION_NAME"));
+	/**
+	 * @param statement
+	 * @throws SQLException 
+	 */
+	private static void Update(Statement statement) throws SQLException {
+		statement.executeUpdate("UPDATE regions set region_id = 7 where region_name = 'Antartica'");
+	}
+ 
+	private static List<String> Reterive(Statement statement) throws SQLException {
+		ResultSet resultset = statement.executeQuery("SELECT * from regions where region_name LIKE '%A%' order by region_name DESC");
+		List<String> regions = new ArrayList<String>();
+		while(resultset.next()) {
+			//System.out.println(resultset.getInt(1));
+			//System.out.println(resultset.getNString("REGION_NAME"));
+			regions.add(resultset.getNString("REGION_NAME"));
 		}
+		return regions;
+		
 	}
 
-	private static void create(Statement statement) throws SQLException {
-		statement.execute("INSERT INTO REGIONS VALUES(2, 'North America')");
+	private static void Create(Statement statement) throws SQLException {
+		statement.execute("INSERT INTO REGIONS VALUES(6 , 'North America')");
 	}
 }
